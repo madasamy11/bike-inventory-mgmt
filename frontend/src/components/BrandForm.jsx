@@ -37,8 +37,8 @@ export default function BrandForm({ open, setOpen, initial, onSave }) {
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-      <Box component="form" onSubmit={handleSubmit} sx={{ p: 3 }}>
-        <DialogTitle>{initial ? "Edit" : "Add New"} Brand</DialogTitle>
+      <Box component="form" onSubmit={handleSubmit} sx={{ p: 3, background: '#f5f5f5', borderRadius: 2 }}>
+        <DialogTitle sx={{ fontWeight: 600, fontSize: 20, color: '#222', mb: 1 }}>{initial ? "Edit" : "Add New"} Brand</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
             <TextField
@@ -49,12 +49,14 @@ export default function BrandForm({ open, setOpen, initial, onSave }) {
               required
               fullWidth
               autoFocus
+              variant="outlined"
+              sx={{ background: '#fff', borderRadius: 1 }}
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="inherit">Cancel</Button>
-          <Button type="submit" variant="contained" color="primary">Save</Button>
+        <DialogActions sx={{ justifyContent: 'space-between', px: 2 }}>
+          <Button onClick={() => setOpen(false)} color="inherit" variant="outlined" sx={{ borderRadius: 2 }}>Cancel</Button>
+          <Button type="submit" variant="contained" color="primary" sx={{ borderRadius: 2, fontWeight: 600 }}>Save</Button>
         </DialogActions>
       </Box>
     </Dialog>

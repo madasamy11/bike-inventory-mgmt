@@ -66,69 +66,67 @@ export default function InventoryForm({ open, setOpen, initial, onSave, fixedBra
   };
 
   return (
-    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-      <Box component="form" onSubmit={handleSubmit} sx={{ p: 3 }}>
-        <DialogTitle>{initial ? "Edit" : "Add New"} Bike</DialogTitle>
+    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+      <Box component="form" onSubmit={handleSubmit} sx={{ p: 3, background: '#f5f5f5', borderRadius: 2 }}>
+        <DialogTitle sx={{ fontWeight: 600, fontSize: 20, color: '#222', mb: 1 }}>{initial ? "Edit" : "Add New"} Bike</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-            <Box>
-              <TextField
-                select
-                name="brand"
-                label="Brand"
-                value={form.brand}
-                onChange={handleChange}
-                required
-                fullWidth
-                disabled={!!fixedBrand}
-              >
-                {BRANDS.map(b => (
-                  <MenuItem key={b} value={b}>{b}</MenuItem>
-                ))}
-                {fixedBrand && !BRANDS.includes(fixedBrand) && (
-                  <MenuItem key={fixedBrand} value={fixedBrand}>{fixedBrand}</MenuItem>
-                )}
-                {!fixedBrand && form.brand && !BRANDS.includes(form.brand) && (
-                  <MenuItem key={form.brand} value={form.brand}>{form.brand}</MenuItem>
-                )}
-              </TextField>
-            </Box>
-            <TextField name="model" label="Model" value={form.model} onChange={handleChange} required fullWidth />
-            <TextField name="licensePlate" label="License Plate" value={form.licensePlate} onChange={handleChange} required fullWidth />
-            <TextField name="year" label="Year" type="number" value={form.year} onChange={handleChange} required fullWidth />
-            <TextField name="price" label="Price" type="number" value={form.price} onChange={handleChange} required fullWidth />
-            <Box>
-              <TextField
-                select
-                name="condition"
-                label="Condition"
-                value={form.condition}
-                onChange={handleChange}
-                required
-                fullWidth
-              >
-                {CONDITIONS.map(c => (
-                  <MenuItem key={c} value={c}>{c}</MenuItem>
-                ))}
-              </TextField>
-            </Box>
-            <Box>
-              <TextField
-                select
-                name="status"
-                label="Status"
-                value={form.status}
-                onChange={handleChange}
-                required
-                fullWidth
-              >
-                {STATUS.map(s => (
-                  <MenuItem key={s} value={s}>{s}</MenuItem>
-                ))}
-              </TextField>
-            </Box>
-            <TextField name="images" label="Images" value={form.images} disabled fullWidth />
-            <TextField name="inDate" label="InDate" type="date" value={form.inDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} />
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr' }, gap: 2 }}>
+            <TextField
+              select
+              name="brand"
+              label="Brand"
+              value={form.brand}
+              onChange={handleChange}
+              required
+              fullWidth
+              disabled={!!fixedBrand}
+              variant="outlined"
+              sx={{ background: '#fff', borderRadius: 1 }}
+            >
+              {BRANDS.map(b => (
+                <MenuItem key={b} value={b}>{b}</MenuItem>
+              ))}
+              {fixedBrand && !BRANDS.includes(fixedBrand) && (
+                <MenuItem key={fixedBrand} value={fixedBrand}>{fixedBrand}</MenuItem>
+              )}
+              {!fixedBrand && form.brand && !BRANDS.includes(form.brand) && (
+                <MenuItem key={form.brand} value={form.brand}>{form.brand}</MenuItem>
+              )}
+            </TextField>
+            <TextField name="model" label="Model" value={form.model} onChange={handleChange} required fullWidth variant="outlined" sx={{ background: '#fff', borderRadius: 1 }} />
+            <TextField name="licensePlate" label="License Plate" value={form.licensePlate} onChange={handleChange} fullWidth variant="outlined" sx={{ background: '#fff', borderRadius: 1 }} />
+            <TextField name="year" label="Year" type="number" value={form.year} onChange={handleChange} required fullWidth variant="outlined" sx={{ background: '#fff', borderRadius: 1 }} />
+            <TextField name="price" label="Price" type="number" value={form.price} onChange={handleChange} required fullWidth variant="outlined" sx={{ background: '#fff', borderRadius: 1 }} />
+            <TextField
+              select
+              name="condition"
+              label="Condition"
+              value={form.condition}
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+              sx={{ background: '#fff', borderRadius: 1 }}
+            >
+              {CONDITIONS.map(c => (
+                <MenuItem key={c} value={c}>{c}</MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              name="status"
+              label="Status"
+              value={form.status}
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+              sx={{ background: '#fff', borderRadius: 1 }}
+            >
+              {STATUS.map(s => (
+                <MenuItem key={s} value={s}>{s}</MenuItem>
+              ))}
+            </TextField>
+            <TextField name="images" label="Images" value={form.images} disabled fullWidth variant="outlined" sx={{ background: '#fff', borderRadius: 1 }} />
+            <TextField name="inDate" label="InDate" type="date" value={form.inDate} onChange={handleChange} fullWidth InputLabelProps={{ shrink: true }} variant="outlined" sx={{ background: '#fff', borderRadius: 1 }} />
             <TextField 
               name="outDate" 
               label="OutDate" 
@@ -139,13 +137,15 @@ export default function InventoryForm({ open, setOpen, initial, onSave, fixedBra
               disabled={form.status !== "Sold"}
               fullWidth 
               InputLabelProps={{ shrink: true }} 
+              variant="outlined"
+              sx={{ background: '#fff', borderRadius: 1 }}
             />
-            <TextField name="notes" label="Notes" value={form.notes} onChange={handleChange} multiline rows={2} placeholder="Enter things to remember" fullWidth />
+            <TextField name="notes" label="Notes" value={form.notes} onChange={handleChange} multiline rows={2} placeholder="Enter things to remember" fullWidth variant="outlined" sx={{ background: '#fff', borderRadius: 1 }} />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="inherit">Cancel</Button>
-          <Button type="submit" variant="contained" color="primary">Save</Button>
+        <DialogActions sx={{ justifyContent: 'space-between', px: 2 }}>
+          <Button onClick={() => setOpen(false)} color="inherit" variant="outlined" sx={{ borderRadius: 2 }}>Cancel</Button>
+          <Button type="submit" variant="contained" color="primary" sx={{ borderRadius: 2, fontWeight: 600 }}>Save</Button>
         </DialogActions>
       </Box>
     </Dialog>
