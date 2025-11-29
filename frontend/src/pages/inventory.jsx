@@ -68,7 +68,14 @@ export default function Inventory() {
       <Container maxWidth="md" sx={{ flex: 1, py: 6 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
           <Typography variant="h4" fontWeight={700}>Inventory</Typography>
-          <Button variant="contained" color="primary" onClick={handleAdd}>Add Bike</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAdd}
+            sx={{ borderRadius: 2, fontWeight: 600, boxShadow: 2, px: 3, py: 1, fontSize: 16 }}
+          >
+            Add Bike
+          </Button>
         </Box>
         <InventoryTable bikes={bikes} onEdit={handleEdit} onDelete={handleDelete} />
         <InventoryForm open={open} setOpen={setOpen} initial={edit} onSave={handleSave} />

@@ -7,7 +7,12 @@ const bikeSchema = new mongoose.Schema({
   year: Number,
   price: Number,
   condition: String,
-  status: { type: String, enum: ["Available", "Sold"], default: "Available" },
+  status: {
+    type: String,
+    enum: ["Available", "Sold"],
+    default: "Available",
+    set: v => v === "" ? undefined : v
+  },
   images: [String],
   inDate: Date,
   outDate: Date,

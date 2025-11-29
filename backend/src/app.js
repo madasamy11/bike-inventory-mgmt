@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/auth.js";
 import bikeRoutes from "./routes/bike.js";
+import brandRoutes from "./routes/brand.js";
 
 dotenv.config();
 const app = ess();
@@ -18,6 +19,7 @@ app.use(helmet());
 // Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/bikes", bikeRoutes);
+app.use("/api/v1/brands", brandRoutes);
 
 // DB + Server
 connectDB()
