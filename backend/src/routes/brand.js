@@ -138,7 +138,7 @@ router.put("/:id", authMiddleware(["admin", "manager"]), async (req, res) => {
       { name: trimmedName }, 
       { new: true }
     );
-    res.json({ brand, bikesUpdated: updateResult.modifiedCount });
+    res.json(brand);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
