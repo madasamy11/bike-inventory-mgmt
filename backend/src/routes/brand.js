@@ -91,6 +91,14 @@ router.put("/:id", authMiddleware(["admin", "manager"]), async (req, res) => {
       return res.status(404).json({ message: "Brand not found" });
     }
     
+    // Check if new brand name already exists (excluding current brand)
+    if (name !== oldBrand.name) {
+      const existingBrand = await Brand.findOne({ name });
+      if (existingBrand) {
+        return res.status(400).json({ message: "Brand name already exists" });
+      }
+    }
+    
     // Update all bikes with the old brand name to the new brand name
     await Bike.updateMany({ brand: oldBrand.name }, { brand: name });
     

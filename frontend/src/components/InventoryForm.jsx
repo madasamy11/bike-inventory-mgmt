@@ -88,6 +88,9 @@ export default function InventoryForm({ open, setOpen, initial, onSave, fixedBra
                 {fixedBrand && !BRANDS.includes(fixedBrand) && (
                   <MenuItem key={fixedBrand} value={fixedBrand}>{fixedBrand}</MenuItem>
                 )}
+                {!fixedBrand && form.brand && !BRANDS.includes(form.brand) && (
+                  <MenuItem key={form.brand} value={form.brand}>{form.brand}</MenuItem>
+                )}
               </TextField>
             </Box>
             <TextField name="model" label="Model" value={form.model} onChange={handleChange} required fullWidth />

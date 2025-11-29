@@ -35,19 +35,8 @@ export default function BrandItems({ brandName, onBack }) {
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [bikesRes, statsRes] = await Promise.all([
-          api.get(`/brands/${encodeURIComponent(brandName)}/bikes`),
-          api.get(`/brands/${encodeURIComponent(brandName)}/stats`)
-        ]);
-        setBikes(bikesRes.data);
-        setStats(statsRes.data);
-      } catch {
-        setSnack({ open: true, message: "Failed to load data" });
-      }
-    };
-    loadData();
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brandName]);
 
   const handleAdd = () => {
