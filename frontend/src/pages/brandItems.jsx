@@ -11,18 +11,22 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
+import CircularProgress from '@mui/material/CircularProgress';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
+import { formatCurrency } from "../utils/formatters";
 
 export default function BrandItems({ brandName, onBack }) {
   const [bikes, setBikes] = useState([]);
   const [stats, setStats] = useState({ totalQuantity: 0, totalAmount: 0 });
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState(null);
   const [snack, setSnack] = useState({ open: false, message: "" });
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const [bikesRes, statsRes] = await Promise.all([
         api.get(`/brands/${encodeURIComponent(brandName)}/bikes`),
         api.get(`/brands/${encodeURIComponent(brandName)}/stats`)
@@ -31,6 +35,8 @@ export default function BrandItems({ brandName, onBack }) {
       setStats(statsRes.data);
     } catch {
       setSnack({ open: true, message: "Failed to load data" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,8 +59,10 @@ export default function BrandItems({ brandName, onBack }) {
     try {
       await api.delete(`/bikes/${_id}`);
       setBikes(bikes.filter(b => b._id !== _id));
+      // Refresh stats after deletion
+      const statsRes = await api.get(`/brands/${encodeURIComponent(brandName)}/stats`);
+      setStats(statsRes.data);
       setSnack({ open: true, message: "Bike deleted" });
-      fetchData();
     } catch {
       setSnack({ open: true, message: "Delete failed" });
     }
@@ -68,8 +76,10 @@ export default function BrandItems({ brandName, onBack }) {
       try {
         const res = await api.put(`/bikes/${edit._id}`, bikeData);
         setBikes(bikes.map(b => (b._id === edit._id ? res.data : b)));
+        // Refresh stats after update (price might have changed)
+        const statsRes = await api.get(`/brands/${encodeURIComponent(brandName)}/stats`);
+        setStats(statsRes.data);
         setSnack({ open: true, message: "Bike updated" });
-        fetchData();
       } catch {
         setSnack({ open: true, message: "Update failed" });
       }
@@ -77,20 +87,14 @@ export default function BrandItems({ brandName, onBack }) {
       try {
         const res = await api.post("/bikes", bikeData);
         setBikes([...bikes, res.data]);
+        // Refresh stats after adding new bike
+        const statsRes = await api.get(`/brands/${encodeURIComponent(brandName)}/stats`);
+        setStats(statsRes.data);
         setSnack({ open: true, message: "Bike added" });
-        fetchData();
       } catch {
         setSnack({ open: true, message: "Add failed" });
       }
     }
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-IN', { 
-      style: 'currency', 
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(value);
   };
 
   return (
@@ -150,14 +154,24 @@ export default function BrandItems({ brandName, onBack }) {
         </Box>
 
         {/* Inventory Table */}
-        <InventoryTable bikes={bikes} onEdit={handleEdit} onDelete={handleDelete} />
-
-        {bikes.length === 0 && (
+        {loading ? (
           <Box textAlign="center" py={8}>
-            <Typography variant="h6" color="text.secondary">
-              No bikes found for this brand. Click "Add Bike" to get started.
+            <CircularProgress size={60} />
+            <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
+              Loading bikes...
             </Typography>
           </Box>
+        ) : (
+          <>
+            <InventoryTable bikes={bikes} onEdit={handleEdit} onDelete={handleDelete} />
+            {bikes.length === 0 && (
+              <Box textAlign="center" py={8}>
+                <Typography variant="h6" color="text.secondary">
+                  No bikes found for this brand. Click "Add Bike" to get started.
+                </Typography>
+              </Box>
+            )}
+          </>
         )}
 
         <InventoryForm 

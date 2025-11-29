@@ -31,7 +31,8 @@ export default function BrandForm({ open, setOpen, initial, onSave }) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    onSave(form);
+    // Convert brand name to uppercase for consistency and duplicate prevention
+    onSave({ ...form, name: form.name.toUpperCase() });
     setOpen(false);
   };
 

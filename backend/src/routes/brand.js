@@ -69,12 +69,15 @@ router.get("/summary", authMiddleware(), async (req, res) => {
 router.post("/", authMiddleware(["admin", "manager"]), async (req, res) => {
   try {
     const { name } = req.body;
-    const existingBrand = await Brand.findOne({ name });
+    // Convert to uppercase for consistency
+    const upperName = name.toUpperCase();
+    // Case-insensitive duplicate check
+    const existingBrand = await Brand.findOne({ name: { $regex: new RegExp(`^${upperName}$`, 'i') } });
     if (existingBrand) {
       return res.status(400).json({ message: "Brand already exists" });
     }
     
-    const brand = new Brand({ name });
+    const brand = new Brand({ name: upperName });
     await brand.save();
     res.json(brand);
   } catch (err) {
@@ -86,27 +89,29 @@ router.post("/", authMiddleware(["admin", "manager"]), async (req, res) => {
 router.put("/:id", authMiddleware(["admin", "manager"]), async (req, res) => {
   try {
     const { name } = req.body;
+    // Convert to uppercase for consistency
+    const upperName = name.toUpperCase();
     const oldBrand = await Brand.findById(req.params.id);
     if (!oldBrand) {
       return res.status(404).json({ message: "Brand not found" });
     }
     
-    // Check if new brand name already exists (excluding current brand)
-    if (name !== oldBrand.name) {
-      const existingBrand = await Brand.findOne({ name });
+    // Check if new brand name already exists (case-insensitive, excluding current brand)
+    if (upperName !== oldBrand.name.toUpperCase()) {
+      const existingBrand = await Brand.findOne({ name: { $regex: new RegExp(`^${upperName}$`, 'i') } });
       if (existingBrand) {
         return res.status(400).json({ message: "Brand name already exists" });
       }
     }
     
     // Update all bikes with the old brand name to the new brand name
-    const updateResult = await Bike.updateMany({ brand: oldBrand.name }, { brand: name });
+    const updateResult = await Bike.updateMany({ brand: oldBrand.name }, { brand: upperName });
     // Log the number of bikes updated for audit purposes
-    console.log(`Brand update: ${updateResult.modifiedCount} bikes updated from '${oldBrand.name}' to '${name}'`);
+    console.log(`Brand update: ${updateResult.modifiedCount} bikes updated from '${oldBrand.name}' to '${upperName}'`);
     
     const brand = await Brand.findByIdAndUpdate(
       req.params.id, 
-      { name }, 
+      { name: upperName }, 
       { new: true }
     );
     res.json(brand);
