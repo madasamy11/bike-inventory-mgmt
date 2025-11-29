@@ -5,41 +5,35 @@ import { authMiddleware } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-// Helper function to escape special regex characters to prevent ReDoS attacks
-const escapeRegex = (string) => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-};
-
-// Get all brands with their aggregated stats using $lookup for better performance
+// Get all brands with their aggregated stats
 router.get("/", authMiddleware(), async (req, res) => {
   try {
-    const brandsWithStats = await Brand.aggregate([
-      { $sort: { name: 1 } },
-      {
-        $lookup: {
-          from: "bikes",
-          localField: "name",
-          foreignField: "brand",
-          as: "bikes"
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          totalQuantity: { $size: "$bikes" },
-          totalAmount: {
-            $cond: [
-              { $gt: [{ $size: "$bikes" }, 0] },
-              { $sum: "$bikes.price" },
-              0
-            ]
-          },
-          createdAt: 1,
-          updatedAt: 1
-        }
-      }
-    ]);
+    const brands = await Brand.find().sort({ name: 1 });
+    
+    // Get aggregated stats for each brand
+    const brandsWithStats = await Promise.all(
+      brands.map(async (brand) => {
+        const stats = await Bike.aggregate([
+          { $match: { brand: brand.name } },
+          {
+            $group: {
+              _id: null,
+              totalQuantity: { $sum: 1 },
+              totalAmount: { $sum: "$price" }
+            }
+          }
+        ]);
+        
+        return {
+          _id: brand._id,
+          name: brand.name,
+          totalQuantity: stats[0]?.totalQuantity || 0,
+          totalAmount: stats[0]?.totalAmount || 0,
+          createdAt: brand.createdAt,
+          updatedAt: brand.updatedAt
+        };
+      })
+    );
     
     res.json(brandsWithStats);
   } catch (err) {
@@ -75,25 +69,12 @@ router.get("/summary", authMiddleware(), async (req, res) => {
 router.post("/", authMiddleware(["admin", "manager"]), async (req, res) => {
   try {
     const { name } = req.body;
-    
-    // Validate brand name
-    if (!name || !name.trim()) {
-      return res.status(400).json({ message: "Brand name is required" });
-    }
-    if (name.trim().length > 100) {
-      return res.status(400).json({ message: "Brand name is too long" });
-    }
-    const trimmedName = name.trim();
-    
-    // Case-insensitive duplicate check
-    const existingBrand = await Brand.findOne({ 
-      name: { $regex: new RegExp(`^${escapeRegex(trimmedName)}$`, 'i') }
-    });
+    const existingBrand = await Brand.findOne({ name });
     if (existingBrand) {
       return res.status(400).json({ message: "Brand already exists" });
     }
     
-    const brand = new Brand({ name: trimmedName });
+    const brand = new Brand({ name });
     await brand.save();
     res.json(brand);
   } catch (err) {
@@ -105,37 +86,27 @@ router.post("/", authMiddleware(["admin", "manager"]), async (req, res) => {
 router.put("/:id", authMiddleware(["admin", "manager"]), async (req, res) => {
   try {
     const { name } = req.body;
-    
-    // Validate brand name
-    if (!name || !name.trim()) {
-      return res.status(400).json({ message: "Brand name is required" });
-    }
-    if (name.trim().length > 100) {
-      return res.status(400).json({ message: "Brand name is too long" });
-    }
-    const trimmedName = name.trim();
-    
     const oldBrand = await Brand.findById(req.params.id);
     if (!oldBrand) {
       return res.status(404).json({ message: "Brand not found" });
     }
     
-    // Case-insensitive duplicate check (excluding current brand)
-    if (trimmedName.toLowerCase() !== oldBrand.name.toLowerCase()) {
-      const existingBrand = await Brand.findOne({ 
-        name: { $regex: new RegExp(`^${escapeRegex(trimmedName)}$`, 'i') }
-      });
+    // Check if new brand name already exists (excluding current brand)
+    if (name !== oldBrand.name) {
+      const existingBrand = await Brand.findOne({ name });
       if (existingBrand) {
         return res.status(400).json({ message: "Brand name already exists" });
       }
     }
     
     // Update all bikes with the old brand name to the new brand name
-    const updateResult = await Bike.updateMany({ brand: oldBrand.name }, { brand: trimmedName });
+    const updateResult = await Bike.updateMany({ brand: oldBrand.name }, { brand: name });
+    // Log the number of bikes updated for audit purposes
+    console.log(`Brand update: ${updateResult.modifiedCount} bikes updated from '${oldBrand.name}' to '${name}'`);
     
     const brand = await Brand.findByIdAndUpdate(
       req.params.id, 
-      { name: trimmedName }, 
+      { name }, 
       { new: true }
     );
     res.json(brand);
@@ -147,8 +118,7 @@ router.put("/:id", authMiddleware(["admin", "manager"]), async (req, res) => {
 // Get bikes by brand name
 router.get("/:brandName/bikes", authMiddleware(), async (req, res) => {
   try {
-    const brandName = decodeURIComponent(req.params.brandName);
-    const bikes = await Bike.find({ brand: brandName });
+    const bikes = await Bike.find({ brand: req.params.brandName });
     res.json(bikes);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -158,9 +128,8 @@ router.get("/:brandName/bikes", authMiddleware(), async (req, res) => {
 // Get brand stats by name
 router.get("/:brandName/stats", authMiddleware(), async (req, res) => {
   try {
-    const brandName = decodeURIComponent(req.params.brandName);
     const stats = await Bike.aggregate([
-      { $match: { brand: brandName } },
+      { $match: { brand: req.params.brandName } },
       {
         $group: {
           _id: null,
@@ -171,7 +140,7 @@ router.get("/:brandName/stats", authMiddleware(), async (req, res) => {
     ]);
     
     res.json({
-      brandName,
+      brandName: req.params.brandName,
       totalQuantity: stats[0]?.totalQuantity || 0,
       totalAmount: stats[0]?.totalAmount || 0
     });
