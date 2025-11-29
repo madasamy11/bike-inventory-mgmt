@@ -14,12 +14,12 @@ export default function InventoryTable({ bikes, onEdit, onDelete }) {
     <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2, boxShadow: 2, p: 2 }}>
       <Table sx={{ minWidth: 650 }}>
         <TableHead>
-          <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-            <TableCell sx={{ color: '#222', fontWeight: 600, fontSize: 15 }}>Brand</TableCell>
-            <TableCell sx={{ color: '#222', fontWeight: 600, fontSize: 15 }}>Model</TableCell>
-            <TableCell sx={{ color: '#222', fontWeight: 600, fontSize: 15 }}>Year</TableCell>
-            <TableCell sx={{ color: '#222', fontWeight: 600, fontSize: 15 }}>Price</TableCell>
-            <TableCell sx={{ color: '#222', fontWeight: 600, fontSize: 15, textAlign: 'center' }}>Actions</TableCell>
+          <TableRow sx={{ background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)' }}>
+            <TableCell sx={{ color: '#f9f6f6ff', fontWeight: 600, fontSize: 15 }}>Brand</TableCell>
+            <TableCell sx={{ color: '#f9f6f6ff', fontWeight: 600, fontSize: 15 }}>Model</TableCell>
+            <TableCell sx={{ color: '#f9f6f6ff', fontWeight: 600, fontSize: 15 }}>Year</TableCell>
+            <TableCell sx={{ color: '#f9f6f6ff', fontWeight: 600, fontSize: 15 }}>Price</TableCell>
+            <TableCell sx={{ color: '#f9f6f6ff', fontWeight: 600, fontSize: 15, textAlign: 'center' }}>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
