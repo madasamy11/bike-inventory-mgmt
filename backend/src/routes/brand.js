@@ -100,14 +100,16 @@ router.put("/:id", authMiddleware(["admin", "manager"]), async (req, res) => {
     }
     
     // Update all bikes with the old brand name to the new brand name
-    await Bike.updateMany({ brand: oldBrand.name }, { brand: name });
+    const updateResult = await Bike.updateMany({ brand: oldBrand.name }, { brand: name });
+    // Log the number of bikes updated for audit purposes
+    console.log(`Brand update: ${updateResult.modifiedCount} bikes updated from '${oldBrand.name}' to '${name}'`);
     
     const brand = await Brand.findByIdAndUpdate(
       req.params.id, 
       { name }, 
       { new: true }
     );
-    res.json(brand);
+    res.json({ brand, bikesUpdated: updateResult.modifiedCount });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
