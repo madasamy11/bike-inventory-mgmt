@@ -28,7 +28,7 @@ const DEFAULT_FORM = {
   notes: ""
 };
 
-export default function InventoryForm({ open, setOpen, initial, onSave }) {
+export default function InventoryForm({ open, setOpen, initial, onSave, fixedBrand }) {
   const [form, setForm] = useState(DEFAULT_FORM);
 
   useEffect(() => {
@@ -37,11 +37,11 @@ export default function InventoryForm({ open, setOpen, initial, onSave }) {
         // Editing existing bike → merge with defaults
         setForm({ ...DEFAULT_FORM, ...initial });
       } else {
-        // Adding new bike → reset to defaults
-        setForm(DEFAULT_FORM);
+        // Adding new bike → reset to defaults, set fixedBrand if provided
+        setForm({ ...DEFAULT_FORM, brand: fixedBrand || "" });
       }
     }
-  }, [open, initial]);
+  }, [open, initial, fixedBrand]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -80,10 +80,14 @@ export default function InventoryForm({ open, setOpen, initial, onSave }) {
                 onChange={handleChange}
                 required
                 fullWidth
+                disabled={!!fixedBrand}
               >
                 {BRANDS.map(b => (
                   <MenuItem key={b} value={b}>{b}</MenuItem>
                 ))}
+                {fixedBrand && !BRANDS.includes(fixedBrand) && (
+                  <MenuItem key={fixedBrand} value={fixedBrand}>{fixedBrand}</MenuItem>
+                )}
               </TextField>
             </Box>
             <TextField name="model" label="Model" value={form.model} onChange={handleChange} required fullWidth />
