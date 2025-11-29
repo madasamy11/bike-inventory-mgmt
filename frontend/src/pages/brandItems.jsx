@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../services/api";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -21,7 +21,7 @@ export default function BrandItems({ brandName, onBack }) {
   const [edit, setEdit] = useState(null);
   const [snack, setSnack] = useState({ open: false, message: "" });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [bikesRes, statsRes] = await Promise.all([
         api.get(`/brands/${encodeURIComponent(brandName)}/bikes`),
@@ -32,12 +32,11 @@ export default function BrandItems({ brandName, onBack }) {
     } catch {
       setSnack({ open: true, message: "Failed to load data" });
     }
-  };
+  }, [brandName]);
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [brandName]);
+  }, [fetchData]);
 
   const handleAdd = () => {
     setEdit(null);
@@ -151,14 +150,6 @@ export default function BrandItems({ brandName, onBack }) {
 
         {/* Inventory Table */}
         <InventoryTable bikes={bikes} onEdit={handleEdit} onDelete={handleDelete} />
-
-        {bikes.length === 0 && (
-          <Box textAlign="center" py={8}>
-            <Typography variant="h6" color="text.secondary">
-              No bikes found for this brand. Click "Add Bike" to get started.
-            </Typography>
-          </Box>
-        )}
 
         <InventoryForm 
           open={open} 
