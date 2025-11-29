@@ -4,13 +4,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import api from "../services/api";
 
-
-const BRANDS = ["Honda", "Yamaha", "TVS", "Hero", "Suzuki", "Royal Enfield"];
 const CONDITIONS = ["Great", "Good", "Average"];
 const STATUS = ["Available", "Sold"];
 
@@ -30,6 +28,20 @@ const DEFAULT_FORM = {
 
 export default function InventoryForm({ open, setOpen, initial, onSave, fixedBrand }) {
   const [form, setForm] = useState(DEFAULT_FORM);
+  const [brands, setBrands] = useState([]);
+
+  // Fetch brands from API
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await api.get("/brands");
+        setBrands(res.data.map(b => b.name));
+      } catch {
+        // Silently fail - brands will be empty
+      }
+    };
+    fetchBrands();
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -83,13 +95,13 @@ export default function InventoryForm({ open, setOpen, initial, onSave, fixedBra
               variant="outlined"
               sx={{ background: '#fff', borderRadius: 1 }}
             >
-              {BRANDS.map(b => (
+              {brands.map(b => (
                 <MenuItem key={b} value={b}>{b}</MenuItem>
               ))}
-              {fixedBrand && !BRANDS.includes(fixedBrand) && (
+              {fixedBrand && !brands.includes(fixedBrand) && (
                 <MenuItem key={fixedBrand} value={fixedBrand}>{fixedBrand}</MenuItem>
               )}
-              {!fixedBrand && form.brand && !BRANDS.includes(form.brand) && (
+              {!fixedBrand && form.brand && !brands.includes(form.brand) && (
                 <MenuItem key={form.brand} value={form.brand}>{form.brand}</MenuItem>
               )}
             </TextField>

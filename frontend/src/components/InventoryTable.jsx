@@ -37,10 +37,10 @@ export default function InventoryTable({ bikes, onEdit, onDelete }) {
                 <TableCell sx={{ fontWeight: 400 }}>{bike.year}</TableCell>
                 <TableCell sx={{ fontWeight: 400 }}>₹{bike.price}</TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>
-                  <IconButton color="primary" variant="outlined" onClick={() => onEdit(bike)} sx={{ mx: 0.5, border: '1px solid #90caf9', background: '#fff' }}>
+                  <IconButton aria-label="Edit bike" color="primary" variant="outlined" onClick={() => onEdit(bike)} sx={{ mx: 0.5, border: '1px solid #90caf9', background: '#fff' }}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton color="error" variant="outlined" onClick={() => onDelete(bike._id)} sx={{ mx: 0.5, border: '1px solid #f44336', background: '#fff' }}>
+                  <IconButton aria-label="Delete bike" color="error" variant="outlined" onClick={() => onDelete(bike._id)} sx={{ mx: 0.5, border: '1px solid #f44336', background: '#fff' }}>
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
