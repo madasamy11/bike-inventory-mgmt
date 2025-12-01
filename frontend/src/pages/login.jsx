@@ -11,16 +11,15 @@ import {
   Container,
   Paper,
   Stack,
-  useTheme,
   Fade,
+  Alert,
 } from '@mui/material';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 
 const BRANDS = ["Yamaha", "Honda", "Hero", "Royal Enfield", "Suzuki"];
 
 export default function Login() {
-  const theme = useTheme();
-  const { login } = useContext(AuthContext);
+  const { login, sessionExpiredMessage, clearSessionExpiredMessage } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -35,6 +34,15 @@ export default function Login() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (sessionExpiredMessage) {
+      const timer = setTimeout(() => {
+        clearSessionExpiredMessage();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [sessionExpiredMessage, clearSessionExpiredMessage]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -43,7 +51,7 @@ export default function Login() {
       const { data } = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", data.token);
       login(data.token, data.role, data.name);
-    } catch (err) {
+    } catch {
       setError("Invalid credentials");
     } finally {
       setLoading(false);
@@ -187,6 +195,11 @@ export default function Login() {
                   )
                   }}
                 />
+                {sessionExpiredMessage && (
+                  <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>
+                    {sessionExpiredMessage}
+                  </Alert>
+                )}
                 {error && (
                   <Typography color="error" fontSize={14} textAlign="center" sx={{ mt: -1, mb: 1 }}>
                   {error}
