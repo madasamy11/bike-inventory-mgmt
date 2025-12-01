@@ -2,6 +2,8 @@ import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
+const SESSION_EXPIRED_MESSAGE = "User session expired. Please login again";
+
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
   const [sessionExpiredMessage, setSessionExpiredMessage] = useState("");
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleSessionExpired = () => {
       setAuth(null);
-      setSessionExpiredMessage("User session expired. Please login again");
+      setSessionExpiredMessage(SESSION_EXPIRED_MESSAGE);
     };
 
     window.addEventListener("session-expired", handleSessionExpired);
