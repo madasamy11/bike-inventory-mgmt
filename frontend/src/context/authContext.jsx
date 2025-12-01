@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("role");
     setAuth(null);
+    setSessionExpiredMessage("");
   };
 
   const clearSessionExpiredMessage = () => {
