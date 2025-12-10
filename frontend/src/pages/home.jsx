@@ -18,7 +18,9 @@ import FolderIcon from '@mui/icons-material/Folder';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
+import DownloadIcon from '@mui/icons-material/Download';
 import { formatCurrency } from "../utils/formatters";
+import { exportBikesToExcel } from "../utils/excelExport";
 
 export default function Home({ onBrandClick }) {
   const [brands, setBrands] = useState([]);
@@ -79,6 +81,23 @@ export default function Home({ onBrandClick }) {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      // Fetch all bikes from the API
+      const response = await api.get("/bikes");
+      const bikes = response.data;
+      
+      // Export to Excel
+      exportBikesToExcel(bikes);
+      setSnack({ open: true, message: "Inventory exported successfully" });
+    } catch (error) {
+      const message = error.message === 'No data available to export' 
+        ? "No inventory data to export" 
+        : "Failed to export inventory";
+      setSnack({ open: true, message });
+    }
+  };
+
   return (
     <Box minHeight="100vh" display="flex" flexDirection="column">
       <Header />
@@ -119,14 +138,24 @@ export default function Home({ onBrandClick }) {
         {/* Header with Add Button */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h4" fontWeight={700}>Brands</Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
-          >
-            Add Brand
-          </Button>
+          <Box display="flex" gap={2}>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
+            >
+              Add Brand
+            </Button>
+            <Button 
+              variant="outlined" 
+              color="primary" 
+              startIcon={<DownloadIcon />}
+              onClick={handleExport}
+            >
+              Export Backup
+            </Button>
+          </Box>
         </Box>
 
         {/* Brand Folders Grid */}
