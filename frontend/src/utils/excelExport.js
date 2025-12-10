@@ -22,7 +22,7 @@ export const exportBikesToExcel = (bikes, filename = 'bike-inventory-backup.xlsx
       'Price': bike.price || '',
       'Condition': bike.condition || '',
       'Status': bike.status || '',
-      'Images': Array.isArray(bike.images) ? bike.images.join(', ') : '',
+      'Images': Array.isArray(bike.images) ? bike.images.join(', ') : (bike.images || ''),
       'In Date': bike.inDate ? new Date(bike.inDate).toLocaleDateString() : '',
       'Out Date': bike.outDate ? new Date(bike.outDate).toLocaleDateString() : '',
       'Notes': bike.notes || '',
