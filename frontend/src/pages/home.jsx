@@ -88,7 +88,7 @@ export default function Home({ onBrandClick }) {
       const bikes = response.data;
       
       // Export to Excel
-      exportBikesToExcel(bikes);
+      await exportBikesToExcel(bikes);
       setSnack({ open: true, message: "Inventory exported successfully" });
     } catch (error) {
       const message = error.message === 'No data available to export' 
